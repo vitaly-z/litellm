@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, Switch, Select, Tooltip } from "antd";
+import { Form, Switch, Select, Tooltip, DatePicker } from "antd";
 import { Text, Accordion, AccordionHeader, AccordionBody, TextInput } from "@tremor/react";
 import { Row, Col, Typography } from "antd";
 import TextArea from "antd/es/input/TextArea";
@@ -9,6 +9,7 @@ import CacheControlSettings from "./cache_control_settings";
 import VectorStoreSelector from "../vector_store_management/VectorStoreSelector";
 import { Tag } from "../tag_management/types";
 import { formItemValidateJSON } from "../../utils/textUtils";
+import { ptuCountRules } from "../../utils/ptuValidation";
 const { Link } = Typography;
 
 interface AdvancedSettingsProps {
@@ -180,6 +181,44 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
                   title: tag.description || tag.name,
                 }))}
               />
+            </Form.Item>
+
+            <Form.Item
+              label="PTU Count"
+              name="ptu_count"
+              rules={[{ validator: validateNumber }, ...ptuCountRules]}
+              tooltip="Provisioned throughput units for this deployment. Set together with Cost per PTU / Hour and a Team to attribute a flat daily cost."
+              className="mb-4"
+            >
+              <TextInput placeholder="e.g. 15" />
+            </Form.Item>
+
+            <Form.Item
+              label="Calculated Cost per PTU / Hour (USD)"
+              name="cost_per_ptu_per_hour"
+              rules={[{ validator: validateNumber }]}
+              tooltip="Flat cost = PTU count * this rate * active hours, attributed to the deployment's team."
+              className="mb-4"
+            >
+              <TextInput placeholder="e.g. 2.00" />
+            </Form.Item>
+
+            <Form.Item
+              label="PTU Effective From (UTC)"
+              name="ptu_effective_from"
+              tooltip="Optional start of the PTU window. Flat cost accrues by the hour within the window; a window opening at 23:00 charges one hour that day."
+              className="mb-4"
+            >
+              <DatePicker showTime style={{ width: "100%" }} />
+            </Form.Item>
+
+            <Form.Item
+              label="PTU Effective To (UTC)"
+              name="ptu_effective_to"
+              tooltip="Optional end of the PTU window (exclusive). Leave blank for open-ended."
+              className="mb-4"
+            >
+              <DatePicker showTime style={{ width: "100%" }} />
             </Form.Item>
 
             {customPricing && (
